@@ -135,13 +135,13 @@ const Lane = ({ title, icon: Icon, children }: { title: string, icon: any, child
 
 // SVG Connection Pipe Component
 const ConnectionPipe = ({ active = false }) => (
-  <div className="hidden md:flex flex-col justify-center items-center w-24 relative opacity-80">
+  <div className="hidden md:flex flex-col justify-center items-center w-24 relative opacity-100">
     <svg className="w-full h-32 overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
       <defs>
         <linearGradient id="pipeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="rgba(59, 130, 246, 0.1)" />
-          <stop offset="50%" stopColor="rgba(59, 130, 246, 0.5)" />
-          <stop offset="100%" stopColor="rgba(59, 130, 246, 0.1)" />
+          <stop offset="0%" stopColor="rgba(59, 130, 246, 0.2)" />
+          <stop offset="50%" stopColor="rgba(59, 130, 246, 0.8)" />
+          <stop offset="100%" stopColor="rgba(59, 130, 246, 0.2)" />
         </linearGradient>
         <filter id="glow">
           <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
@@ -157,31 +157,31 @@ const ConnectionPipe = ({ active = false }) => (
         d="M 0,50 C 30,50 30,20 50,20 C 70,20 70,50 100,50"
         fill="none"
         stroke="url(#pipeGradient)"
-        strokeWidth="2"
+        strokeWidth="3"
         className="animate-pulse"
       />
       <path
         d="M 0,50 C 30,50 30,80 50,80 C 70,80 70,50 100,50"
         fill="none"
         stroke="url(#pipeGradient)"
-        strokeWidth="2"
+        strokeWidth="3"
         className="animate-pulse"
         style={{ animationDelay: '1s' }}
       />
 
       {/* Moving Particles */}
-      <circle r="3" fill="#60A5FA" filter="url(#glow)">
+      <circle r="4" fill="#60A5FA" filter="url(#glow)">
         <animateMotion
-          dur="3s"
+          dur="2s"
           repeatCount="indefinite"
           path="M 0,50 C 30,50 30,20 50,20 C 70,20 70,50 100,50"
         />
       </circle>
-      <circle r="3" fill="#60A5FA" filter="url(#glow)">
+      <circle r="4" fill="#60A5FA" filter="url(#glow)">
         <animateMotion
-          dur="4s"
+          dur="3s"
           repeatCount="indefinite"
-          begin="1s"
+          begin="0.5s"
           path="M 0,50 C 30,50 30,80 50,80 C 70,80 70,50 100,50"
         />
       </circle>
@@ -369,13 +369,13 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
 
       {/* Header Overlay - Restyled for better visibility */}
       <div className="absolute top-6 left-8 z-10 pointer-events-none">
-        <div className="bg-slate-900/40 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/5 shadow-2xl">
-          <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3 drop-shadow-md">
-            <Layers className="text-blue-500" size={24} />
+        <div className="bg-slate-900/40 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/5 shadow-2xl">
+          <h2 className="text-sm font-bold text-white tracking-tight flex items-center gap-2 drop-shadow-md">
+            <Layers className="text-blue-500" size={16} />
             Data Observability
           </h2>
-          <p className="text-sm text-slate-400 mt-1 font-medium max-w-lg drop-shadow-sm">
-            Real-time visualization of data flows, processing engines, and insights.
+          <p className="text-[10px] text-slate-400 mt-0.5 font-medium max-w-xs drop-shadow-sm">
+            Real-time visualization of data flows & engines.
           </p>
         </div>
       </div>

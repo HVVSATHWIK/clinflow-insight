@@ -45,9 +45,9 @@ export const TopNav: React.FC<TopNavProps> = ({ currentRole, onRoleChange, onCon
         </button>
 
         <div className="relative group ml-2">
-          <div className="p-2.5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer border border-transparent hover:border-slate-700">
+          <div className="p-2.5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-all cursor-pointer border border-transparent hover:border-white/10 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95">
             <Bell size={20} />
-            <span className="absolute top-2 right-2.5 w-2 h-2 bg-rose-500 border-2 border-slate-900 rounded-full"></span>
+            <span className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-rose-500 border-2 border-slate-900 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.6)] animate-pulse"></span>
           </div>
         </div>
 

@@ -69,15 +69,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleCollapse, c
         <NavItem icon={Settings} label="Configuration" collapsed={isCollapsed} />
 
         {!isCollapsed && (
-          <div className="mt-4 px-4 py-4 bg-slate-800/40 rounded-xl border border-slate-700/50 backdrop-blur-sm">
+          <div className="mt-4 px-4 py-4 bg-gradient-to-br from-slate-900/80 to-slate-800/40 rounded-xl border border-white/5 backdrop-blur-sm shadow-inner group cursor-pointer hover:border-white/10 transition-colors">
             <p className="text-[9px] font-bold text-slate-500 uppercase mb-3 tracking-wide flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></span>
               System Status
             </p>
             <div className="space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400 font-medium">Connector</span>
-                <span className="flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                <span className="text-slate-300 font-medium group-hover:text-white transition-colors">Connector</span>
+                <span className="flex items-center gap-1.5 text-emerald-300 font-bold bg-emerald-500/20 px-2.5 py-1 rounded-full border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                   Active
                 </span>
