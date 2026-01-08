@@ -133,9 +133,59 @@ const Lane = ({ title, icon: Icon, children }: { title: string, icon: any, child
   </div>
 );
 
-const Connector = () => (
-  <div className="hidden md:flex flex-col justify-center items-center px-4 opacity-20">
-    <ArrowRight size={24} className="text-slate-400" />
+// SVG Connection Pipe Component
+const ConnectionPipe = ({ active = false }) => (
+  <div className="hidden md:flex flex-col justify-center items-center w-24 relative opacity-80">
+    <svg className="w-full h-32 overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="pipeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="rgba(59, 130, 246, 0.1)" />
+          <stop offset="50%" stopColor="rgba(59, 130, 246, 0.5)" />
+          <stop offset="100%" stopColor="rgba(59, 130, 246, 0.1)" />
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* Main Pipe Paths */}
+      <path
+        d="M 0,50 C 30,50 30,20 50,20 C 70,20 70,50 100,50"
+        fill="none"
+        stroke="url(#pipeGradient)"
+        strokeWidth="2"
+        className="animate-pulse"
+      />
+      <path
+        d="M 0,50 C 30,50 30,80 50,80 C 70,80 70,50 100,50"
+        fill="none"
+        stroke="url(#pipeGradient)"
+        strokeWidth="2"
+        className="animate-pulse"
+        style={{ animationDelay: '1s' }}
+      />
+
+      {/* Moving Particles */}
+      <circle r="3" fill="#60A5FA" filter="url(#glow)">
+        <animateMotion
+          dur="3s"
+          repeatCount="indefinite"
+          path="M 0,50 C 30,50 30,20 50,20 C 70,20 70,50 100,50"
+        />
+      </circle>
+      <circle r="3" fill="#60A5FA" filter="url(#glow)">
+        <animateMotion
+          dur="4s"
+          repeatCount="indefinite"
+          begin="1s"
+          path="M 0,50 C 30,50 30,80 50,80 C 70,80 70,50 100,50"
+        />
+      </circle>
+    </svg>
   </div>
 );
 
@@ -208,6 +258,7 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
     if (!containerRef.current) return;
     const cw = containerRef.current.clientWidth;
     const ch = containerRef.current.clientHeight;
+    // Use smaller steps for finer control? No, 0.2 is okay. Limits are good.
     const newZoom = Math.min(zoom + 0.2, MAX_ZOOM);
 
     const zoomFactor = newZoom / zoom;
@@ -350,7 +401,7 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
             willChange: 'transform',
           }}
         >
-          <div className="flex items-start gap-12 p-12">
+          <div className="flex items-center gap-4 p-12">
             {/* Stage 1: Sources */}
             <Lane title="Data Sources" icon={Database}>
               {sources.map(node => (
@@ -364,7 +415,7 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
               ))}
             </Lane>
 
-            <Connector />
+            <ConnectionPipe />
 
             {/* Stage 2: Engines */}
             <Lane title="Processing Engines" icon={Cpu}>
@@ -379,7 +430,7 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
               ))}
             </Lane>
 
-            <Connector />
+            <ConnectionPipe />
 
             {/* Stage 3: Insights */}
             <Lane title="Actionable Insights" icon={LineChart}>
