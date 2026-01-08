@@ -5,6 +5,7 @@ import { DataFlowCanvas } from './components/DataFlowCanvas';
 import { InsightPanel } from './components/InsightPanel';
 import { DrillDownModal } from './components/DrillDownModal';
 import { ConnectSourceModal } from './components/ConnectSourceModal';
+import { ThreeBackground } from './components/ThreeBackground';
 import { DATA_NODES, INITIAL_INSIGHTS } from './constants';
 import { FlowNode, UserRole } from './types';
 
@@ -17,7 +18,7 @@ function App() {
 
   // Panel States
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isInsightPanelOpen, setIsInsightPanelOpen] = useState(true);
+  const [isInsightPanelOpen, setIsInsightPanelOpen] = useState(false);
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
 
   const selectedNode = selectedNodeId ? nodes.find(n => n.id === selectedNodeId) || null : null;
@@ -39,7 +40,9 @@ function App() {
   const [currentView, setCurrentView] = useState('data-flow');
 
   return (
-    <div className="flex h-screen w-screen bg-slate-950 overflow-hidden text-slate-100 font-sans selection:bg-blue-500/30">
+    <div className="flex h-screen w-screen bg-slate-950 overflow-hidden text-slate-100 font-sans selection:bg-blue-500/30 relative">
+      <ThreeBackground />
+
       {/* Ambient Background Glows */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse-ring"></div>

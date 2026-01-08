@@ -5,7 +5,6 @@ import {
   AlertOctagon, Layers, ZoomIn, ZoomOut, RotateCcw, ArrowRight,
   Radio, Info, Server, Cpu, LineChart, Grab, Move
 } from 'lucide-react';
-import { ThreeBackground } from './ThreeBackground';
 
 interface DataFlowCanvasProps {
   nodes: FlowNode[];
@@ -168,22 +167,57 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
     }
   }, []);
 
+  // Constants for Limits
+  const MIN_ZOOM = 0.4;
+  const MAX_ZOOM = 2.5;
+  const BOUNDS_PADDING = 200; // Keep at least this much of the content visible
+
+  // Helper to clamp pan values based on current zoom and container size
+  const clampPan = (x: number, y: number, currentZoom: number) => {
+    if (!containerRef.current) return { x, y };
+    const cw = containerRef.current.clientWidth;
+    const ch = containerRef.current.clientHeight;
+    // contentW/H are approx 1200/600 based on standard layout
+    const contentW = 1500;
+    const contentH = 800;
+
+    // Calculate max allowed offsets
+    // We want to prevent driving the content completely off screen.
+    // Left boundary: The right edge of content shouldn't go too far left
+    // Right boundary: The left edge of content shouldn't go too far right
+
+    // minX: Left edge of content is at x. Right edge is at x + (contentW * zoom).
+    // We want x + (contentW * zoom) > BOUNDS_PADDING
+    const minX = BOUNDS_PADDING - (contentW * currentZoom);
+
+    // maxX: We want x < cw - BOUNDS_PADDING
+    const maxX = cw - BOUNDS_PADDING;
+
+    // minY: Top edge at y. Bottom edge at y + (contentH * zoom)
+    // We want y + (contentH * zoom) > BOUNDS_PADDING
+    const minY = BOUNDS_PADDING - (contentH * currentZoom);
+    const maxY = ch - BOUNDS_PADDING;
+
+    return {
+      x: Math.min(Math.max(x, minX), maxX),
+      y: Math.min(Math.max(y, minY), maxY)
+    };
+  };
+
   const handleZoomIn = () => {
-    // Zoom to center of container
     if (!containerRef.current) return;
     const cw = containerRef.current.clientWidth;
     const ch = containerRef.current.clientHeight;
-    const newZoom = Math.min(zoom + 0.2, 2.0);
+    const newZoom = Math.min(zoom + 0.2, MAX_ZOOM);
 
-    // Simple center zoom approx
     const zoomFactor = newZoom / zoom;
     const centerX = cw / 2;
     const centerY = ch / 2;
 
-    setPan(prev => ({
-      x: centerX - (centerX - prev.x) * zoomFactor,
-      y: centerY - (centerY - prev.y) * zoomFactor
-    }));
+    const rawX = centerX - (centerX - pan.x) * zoomFactor;
+    const rawY = centerY - (centerY - pan.y) * zoomFactor;
+
+    setPan(clampPan(rawX, rawY, newZoom));
     setZoom(newZoom);
   };
 
@@ -191,16 +225,16 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
     if (!containerRef.current) return;
     const cw = containerRef.current.clientWidth;
     const ch = containerRef.current.clientHeight;
-    const newZoom = Math.max(zoom - 0.2, 0.4);
+    const newZoom = Math.max(zoom - 0.2, MIN_ZOOM);
 
     const zoomFactor = newZoom / zoom;
     const centerX = cw / 2;
     const centerY = ch / 2;
 
-    setPan(prev => ({
-      x: centerX - (centerX - prev.x) * zoomFactor,
-      y: centerY - (centerY - prev.y) * zoomFactor
-    }));
+    const rawX = centerX - (centerX - pan.x) * zoomFactor;
+    const rawY = centerY - (centerY - pan.y) * zoomFactor;
+
+    setPan(clampPan(rawX, rawY, newZoom));
     setZoom(newZoom);
   };
 
@@ -212,13 +246,14 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
     const contentH = 600;
     const initialX = (cw - contentW) / 2;
     const initialY = (ch - contentH) / 2;
+    // No clamping needed for centered reset, but good practice
     setZoom(1);
     setPan({ x: initialX > 0 ? initialX : 50, y: initialY > 0 ? initialY : 50 });
   };
 
   // Pan Logic
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button === 0) { // Left click
+    if (e.button === 0) {
       setIsDragging(true);
       setLastMousePos({ x: e.clientX, y: e.clientY });
     }
@@ -229,7 +264,10 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
     const deltaX = e.clientX - lastMousePos.x;
     const deltaY = e.clientY - lastMousePos.y;
 
-    setPan(prev => ({ x: prev.x + deltaX, y: prev.y + deltaY }));
+    const newX = pan.x + deltaX;
+    const newY = pan.y + deltaY;
+
+    setPan(clampPan(newX, newY, zoom));
     setLastMousePos({ x: e.clientX, y: e.clientY });
   };
 
@@ -243,45 +281,40 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
     if (!container) return;
 
     const handleWheel = (e: WheelEvent) => {
-      // Prevent browser zoom
-      if (e.ctrlKey || e.metaKey) e.preventDefault();
+      e.preventDefault();
+      e.stopImmediatePropagation();
 
-      // If we want detailed zoom:
-      // Standardize wheel check (some pads scroll, some zoom)
-      if (e.ctrlKey || Math.abs(e.deltaY) < 100) {
-        e.preventDefault();
-        const zoomSensitivity = 0.0015;
-        const delta = -e.deltaY * zoomSensitivity;
-        const newZoom = Math.min(Math.max(zoom + delta, 0.3), 3.0);
+      const isPinch = e.ctrlKey;
+      const zoomSensitivity = isPinch ? 0.005 : 0.001;
 
-        // Calculate mouse position relative to container
-        const rect = container.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
+      const delta = -(e.deltaY) * zoomSensitivity;
+      const newZoom = Math.min(Math.max(zoom + delta, MIN_ZOOM), MAX_ZOOM);
 
-        // Math: newPan = mouse - (mouse - oldPan) * (newZoom/oldZoom)
+      const rect = container.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      if (Math.abs(zoom - newZoom) > 0.0001) {
         const zoomFactor = newZoom / zoom;
+        const rawX = mouseX - (mouseX - pan.x) * zoomFactor;
+        const rawY = mouseY - (mouseY - pan.y) * zoomFactor;
 
-        setPan(prev => ({
-          x: mouseX - (mouseX - prev.x) * zoomFactor,
-          y: mouseY - (mouseY - prev.y) * zoomFactor
-        }));
-
+        setPan(clampPan(rawX, rawY, newZoom));
         setZoom(newZoom);
-      } else {
-        // Standard Panning with wheel (optional, many users expect this on vertical scroll)
-        // setPan(prev => ({ x: prev.x - e.deltaX, y: prev.y - e.deltaY }));
       }
     };
 
-    // Add passive: false to allow preventDefault
     container.addEventListener('wheel', handleWheel, { passive: false });
     return () => container.removeEventListener('wheel', handleWheel);
-  }, [zoom]); // Re-bind when zoom changes to have latest state
+  }, [zoom, pan]); // Add pan as dependency for clampPan if needed, but clampPan uses refs mostly. 
+  // Actually, clampPan is defined in render scope, so it closes over refs. Safe.
+  // BUT: We need to use 'pan' state inside handleWheel if we don't use functional updates.
+  // The existing handleWheel used 'pan' from closure. We must include 'pan' in dependency array OR use functional update carefully.
+  // The clampPan needs current zoom and container dims.
+  // Let's rely on the dependency array [zoom, pan] to refresh the event listener with fresh state clojures.
 
   return (
-    <div className="flex-1 relative overflow-hidden flex flex-col bg-slate-950/0 group select-none">
-      <ThreeBackground />
+    <div className="flex-1 relative overflow-hidden flex flex-col bg-transparent group select-none">
 
       {/* Header Overlay - Restyled for better visibility */}
       <div className="absolute top-6 left-8 z-10 pointer-events-none">
@@ -300,6 +333,7 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
       <div
         ref={containerRef}
         className={`flex-1 overflow-hidden relative z-0 w-full h-full ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        style={{ touchAction: 'none' }} // Critical for preventing browser gestures
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -307,11 +341,13 @@ export const DataFlowCanvas: React.FC<DataFlowCanvasProps> = ({ nodes, currentRo
       >
         <div
           ref={contentRef}
-          className="absolute top-0 left-0 transition-transform duration-75 ease-out origin-top-left pb-32 pr-32"
+          className="absolute top-0 left-0 origin-top-left pb-32 pr-32"
           style={{
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
             width: 'fit-content',
-            height: 'fit-content'
+            height: 'fit-content',
+            // Use hardware acceleration for smoother rendering
+            willChange: 'transform',
           }}
         >
           <div className="flex items-start gap-12 p-12">

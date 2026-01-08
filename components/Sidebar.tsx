@@ -36,8 +36,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleCollapse, c
     >
       <div className={`p-6 pb-6 border-b border-slate-800/60 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-9 h-9 flex-shrink-0 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-blue-900/40">
-            <Activity size={20} />
+          <div className="w-9 h-9 flex-shrink-0 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/40 p-1.5">
+            <img src="/logo.svg" alt="Logo" className="w-full h-full object-contain" />
           </div>
           {!isCollapsed && (
             <div className="transition-opacity duration-300">
