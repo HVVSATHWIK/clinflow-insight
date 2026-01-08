@@ -1,10 +1,18 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+    <linearGradient id="mainGradient" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#3B82F6" />
       <stop offset="100%" stop-color="#8B5CF6" />
     </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="20" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
   </defs>
-  <circle cx="32" cy="32" r="30" fill="url(#grad)" />
-  <path d="M32 18V46M18 32H46" stroke="white" stroke-width="6" stroke-linecap="round" />
+  <path d="M256 512C397.385 512 512 397.385 512 256C512 114.615 397.385 0 256 0C114.615 0 0 114.615 0 256C0 397.385 114.615 512 256 512Z" fill="#F8FAFC"/>
+  <path d="M360 180C360 180 320 140 256 140C192 140 152 180 152 180" stroke="url(#mainGradient)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M152 332C152 332 192 372 256 372C320 372 360 332 360 332" stroke="url(#mainGradient)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="256" cy="256" r="48" fill="url(#mainGradient)" filter="url(#glow)" />
+  <path d="M152 180V332" stroke="url(#mainGradient)" stroke-width="32" stroke-linecap="round" />
+  <path d="M360 180V332" stroke="url(#mainGradient)" stroke-width="32" stroke-linecap="round" />
 </svg>

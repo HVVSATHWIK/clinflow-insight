@@ -10,7 +10,7 @@ export const ThreeBackground: React.FC = () => {
     // Setup
     const width = mountRef.current.clientWidth;
     const height = mountRef.current.clientHeight;
-    
+
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf8fafc); // Match Slate-50/Slate-100
     // Very subtle fog
@@ -25,7 +25,7 @@ export const ThreeBackground: React.FC = () => {
 
     // Data Points (System Nodes Visualization)
     const geometry = new THREE.BufferGeometry();
-    const count = 400; 
+    const count = 150; // Significantly reduced from 400 for cleaner look
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
 
@@ -47,10 +47,10 @@ export const ThreeBackground: React.FC = () => {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const material = new THREE.PointsMaterial({
-      size: 0.5,
+      size: 0.4, // Smaller particles
       vertexColors: true,
       transparent: true,
-      opacity: 0.4, 
+      opacity: 0.2, // Very subtle opacity
     });
 
     const particles = new THREE.Points(geometry, material);
@@ -60,8 +60,8 @@ export const ThreeBackground: React.FC = () => {
     let frameId: number;
     const animate = () => {
       frameId = requestAnimationFrame(animate);
-      particles.rotation.y += 0.0003; // Slow rotation
-      particles.rotation.x += 0.0001; 
+      particles.rotation.y += 0.0001; // Extremely slow rotation
+      particles.rotation.x += 0.00005;
       renderer.render(scene, camera);
     };
     animate();
@@ -92,8 +92,8 @@ export const ThreeBackground: React.FC = () => {
   }, []);
 
   return (
-    <div 
-      ref={mountRef} 
+    <div
+      ref={mountRef}
       className="absolute inset-0 pointer-events-none z-0"
       style={{ opacity: 0.5 }}
     />

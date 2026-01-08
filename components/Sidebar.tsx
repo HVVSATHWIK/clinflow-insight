@@ -4,10 +4,13 @@ import { LayoutDashboard, Database, FileText, Settings, ShieldAlert, Activity, C
 interface SidebarProps {
   isCollapsed: boolean;
   toggleCollapse: () => void;
+  currentView: string;
+  onNavigate: (view: string) => void;
 }
 
-const NavItem = ({ icon: Icon, label, active = false, collapsed = false }: { icon: any, label: string, active?: boolean, collapsed?: boolean }) => (
+const NavItem = ({ icon: Icon, label, active = false, collapsed = false, onClick }: { icon: any, label: string, active?: boolean, collapsed?: boolean, onClick?: () => void }) => (
   <button
+    onClick={onClick}
     className={`group flex items-center ${collapsed ? 'justify-center px-2' : 'justify-between px-3'} py-2.5 rounded-xl text-sm font-medium transition-all duration-200 mx-3 mb-1.5
     ${active
         ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
@@ -23,7 +26,7 @@ const NavItem = ({ icon: Icon, label, active = false, collapsed = false }: { ico
   </button>
 );
 
-export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleCollapse }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleCollapse, currentView, onNavigate }) => {
   return (
     <div
       className={`
@@ -55,11 +58,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleCollapse })
 
       <nav className="flex-1 py-6 overflow-y-auto overflow-x-hidden custom-scrollbar">
         {!isCollapsed && <div className="px-6 mb-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Main Module</div>}
-        <NavItem icon={LayoutDashboard} label="Data Flow" active collapsed={isCollapsed} />
-        <NavItem icon={Database} label="Data Sources" collapsed={isCollapsed} />
-        <NavItem icon={Activity} label="Monitoring" collapsed={isCollapsed} />
-        <NavItem icon={ShieldAlert} label="Safety & PV" collapsed={isCollapsed} />
-        <NavItem icon={FileText} label="Regulatory Reports" collapsed={isCollapsed} />
+        <NavItem icon={LayoutDashboard} label="Data Flow" active={currentView === 'data-flow'} collapsed={isCollapsed} onClick={() => onNavigate('data-flow')} />
+        <NavItem icon={Database} label="Data Sources" active={currentView === 'data-sources'} collapsed={isCollapsed} onClick={() => onNavigate('data-sources')} />
+        <NavItem icon={Activity} label="Monitoring" active={currentView === 'monitoring'} collapsed={isCollapsed} onClick={() => onNavigate('monitoring')} />
+        <NavItem icon={ShieldAlert} label="Safety & PV" active={currentView === 'safety'} collapsed={isCollapsed} onClick={() => onNavigate('safety')} />
+        <NavItem icon={FileText} label="Regulatory Reports" active={currentView === 'reports'} collapsed={isCollapsed} onClick={() => onNavigate('reports')} />
       </nav>
 
       <div className="p-4 border-t border-slate-800/60 bg-slate-900/50">
